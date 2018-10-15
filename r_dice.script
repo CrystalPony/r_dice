@@ -1,0 +1,22 @@
+let playerAddr=Address(base58'3MqbT7j6Xk4frh5RZMfFkAHHNYcQ4rsfFQz')
+let contract = tx.sender
+
+match tx {
+case t:DataTransaction =>
+
+   let rollKey= t.data[0].key
+   let rollValue = extract(getInteger(t.data, rollKey))
+   
+   let inputCorrect = rollKey == "roll" && rollValue >= 3 && rollValue <= 97
+   let inputSigned = inputCorrect && sigVerify(tx.bodyBytes,tx.proofs[0],base58'BJfdwjb5DYk8mHKajoZsFnTGht9D3GMh9QhMtnxntoHM')
+
+   inputSigned
+
+case s:TransferTransaction =>
+
+   let win = tx.timestamp % 100 <= extract(getInteger(contract, "roll"))
+
+   win
+
+case _ => true
+}
